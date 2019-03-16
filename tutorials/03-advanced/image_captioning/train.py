@@ -9,10 +9,23 @@ from build_vocab import Vocabulary
 from model import EncoderCNN, DecoderRNN
 from torch.nn.utils.rnn import pack_padded_sequence
 from torchvision import transforms
-
+import datetime
 
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+now = datetime.datetime.now()
+dir = 'drive/My Drive/NLPResults/'
+
+def append_progress(line):  
+  filename = "Progress" + str(now.day) +'-'+ str(now.hour) + str(now.minute) + str(now.second) + ".txt"
+  with open(dir + filename, 'a') as f:
+    f.write(line+'\n')
+
+def save_progress(name, content):
+  filename = name + str(now.day) +'-'+ str(now.hour) + str(now.minute) + str(now.second) + ".txt"
+  with open(dir + filename, 'wb') as f:
+    f.write(content)
+
 
 def main(args):
     # Create model directory
@@ -66,8 +79,10 @@ def main(args):
 
             # Print log info
             if i % args.log_step == 0:
-                print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Perplexity: {:5.4f}'
-                      .format(epoch, args.num_epochs, i, total_step, loss.item(), np.exp(loss.item()))) 
+                log_info = 'Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Perplexity: {:5.4f}'
+                      .format(epoch, args.num_epochs, i, total_step, loss.item(), np.exp(loss.item()))
+                append_progress(log_info)
+                print() 
                 
             # Save the model checkpoints
             if (i+1) % args.save_step == 0:
@@ -75,6 +90,11 @@ def main(args):
                     args.model_path, 'decoder-{}-{}.ckpt'.format(epoch+1, i+1)))
                 torch.save(encoder.state_dict(), os.path.join(
                     args.model_path, 'encoder-{}-{}.ckpt'.format(epoch+1, i+1)))
+                #Save to DRive
+                torch.save(decoder.state_dict(), os.path.join(
+                    dir, 'decoder-{}-{}-{}.ckpt'.format(epoch+1, i+1,now)))
+                torch.save(encoder.state_dict(), os.path.join(
+                    dir, 'encoder-{}-{}-{}.ckpt'.format(epoch+1, i+1,now)))
 
 
 if __name__ == '__main__':
