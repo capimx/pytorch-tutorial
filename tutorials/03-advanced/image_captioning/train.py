@@ -1,20 +1,21 @@
-import argparse
-import torch
-import torch.nn as nn
-import numpy as np
 import os
+import torch
 import pickle
+import argparse
+import numpy as np
+import torch.nn as nn
 from data_loader import get_loader 
 from build_vocab import Vocabulary
+from torchvision import transforms
 from model import EncoderCNN, DecoderRNN
 from torch.nn.utils.rnn import pack_padded_sequence
-from torchvision import transforms
 import datetime
 
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 now = datetime.datetime.now()
 dir = '/content/drive/My Drive/NLPResults/'
+
 
 def append_progress(line):  
   filename = "Progress" + str(now.day) +'-'+ str(now.hour) + str(now.minute) + str(now.second) + ".txt"
@@ -48,10 +49,10 @@ def main(args):
     data_loader = get_loader(args.image_dir, args.caption_path, vocab, 
                              transform, args.batch_size,
                              shuffle=True, num_workers=args.num_workers) 
-
+    
     # Build the models
     encoder = EncoderCNN(args.embed_size).to(device)
-    decoder = DecoderRNN(args.embed_size, args.hidden_size, len(vocab), args.num_layers).to(device)
+    decoder = DecoderRNN(args.embed_size, args.hidden_size, vocab, args.num_layers).to(device)
     
     # Loss and optimizer
     criterion = nn.CrossEntropyLoss()
@@ -80,8 +81,8 @@ def main(args):
             # Print log info
             if i % args.log_step == 0:
                 log_info = 'Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Perplexity: {:5.4f}'.format(epoch, args.num_epochs, i, total_step, loss.item(), np.exp(loss.item()))
+                print(log_info)
                 append_progress(log_info)
-                print(log_info) 
                 
             # Save the model checkpoints
             if (i+1) % args.save_step == 0:
@@ -89,11 +90,11 @@ def main(args):
                     args.model_path, 'decoder-{}-{}.ckpt'.format(epoch+1, i+1)))
                 torch.save(encoder.state_dict(), os.path.join(
                     args.model_path, 'encoder-{}-{}.ckpt'.format(epoch+1, i+1)))
-                #Save to DRive
+                #Save to Drive
                 torch.save(decoder.state_dict(), os.path.join(
-                    dir, 'decoder-{}-{}-{}.ckpt'.format(epoch+1, i+1,now)))
+                    dir, 'decoder-{}-{}-{}.ckpt'.format(epoch+1, i+1, now)))
                 torch.save(encoder.state_dict(), os.path.join(
-                    dir, 'encoder-{}-{}-{}.ckpt'.format(epoch+1, i+1,now)))
+                    dir, 'encoder-{}-{}-{}.ckpt'.format(epoch+1, i+1, now)))
 
 
 if __name__ == '__main__':
@@ -107,8 +108,8 @@ if __name__ == '__main__':
     parser.add_argument('--save_step', type=int , default=1000, help='step size for saving trained models')
     
     # Model parameters
-    parser.add_argument('--embed_size', type=int , default=256, help='dimension of word embedding vectors')
-    parser.add_argument('--hidden_size', type=int , default=512, help='dimension of lstm hidden states')
+    parser.add_argument('--embed_size', type=int , default=768, help='dimension of word embedding vectors')
+    parser.add_argument('--hidden_size', type=int , default=1536, help='dimension of lstm hidden states')
     parser.add_argument('--num_layers', type=int , default=1, help='number of layers in lstm')
     
     parser.add_argument('--num_epochs', type=int, default=5)
