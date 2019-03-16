@@ -81,7 +81,7 @@ def main(args):
             if i % args.log_step == 0:
                 log_info = 'Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Perplexity: {:5.4f}'.format(epoch, args.num_epochs, i, total_step, loss.item(), np.exp(loss.item()))
                 append_progress(log_info)
-                print() 
+                print(log_info) 
                 
             # Save the model checkpoints
             if (i+1) % args.save_step == 0:
