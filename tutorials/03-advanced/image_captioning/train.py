@@ -14,7 +14,7 @@ import datetime
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 now = datetime.datetime.now()
-dir = 'drive/My Drive/NLPResults/'
+dir = '/content/drive/My Drive/NLPResults/'
 
 def append_progress(line):  
   filename = "Progress" + str(now.day) +'-'+ str(now.hour) + str(now.minute) + str(now.second) + ".txt"
@@ -79,8 +79,7 @@ def main(args):
 
             # Print log info
             if i % args.log_step == 0:
-                log_info = 'Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Perplexity: {:5.4f}'
-                      .format(epoch, args.num_epochs, i, total_step, loss.item(), np.exp(loss.item()))
+                log_info = 'Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Perplexity: {:5.4f}'.format(epoch, args.num_epochs, i, total_step, loss.item(), np.exp(loss.item()))
                 append_progress(log_info)
                 print() 
                 
