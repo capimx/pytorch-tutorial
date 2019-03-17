@@ -7,7 +7,7 @@ from torch.nn.utils.rnn import pack_padded_sequence
 class EncoderCNNBaseline(nn.Module):
     def __init__(self, embed_size):
         """Load the pretrained ResNet-152 and replace top fc layer."""
-        super(EncoderCNN, self).__init__()
+        super(EncoderCNNBaseline, self).__init__()
         resnet = models.resnet152(pretrained=True)
         modules = list(resnet.children())[:-1]      # delete the last fc layer.
         self.resnet = nn.Sequential(*modules)
@@ -26,7 +26,7 @@ class EncoderCNNBaseline(nn.Module):
 class DecoderRNNBaseline(nn.Module):
     def __init__(self, embed_size, hidden_size, vocab_size, num_layers, max_seq_length=20):
         """Set the hyper-parameters and build the layers."""
-        super(DecoderRNN, self).__init__()
+        super(DecoderRNNBaseline, self).__init__()
         self.embed = nn.Embedding(vocab_size, embed_size)
         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers, batch_first=True)
         self.linear = nn.Linear(hidden_size, vocab_size)

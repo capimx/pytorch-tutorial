@@ -9,7 +9,7 @@ from torch.nn.utils.rnn import pack_padded_sequence
 class EncoderCNNBert(nn.Module):
     def __init__(self, embed_size):
         """Load the pretrained ResNet-152 and replace top fc layer."""
-        super(EncoderCNN, self).__init__()
+        super(EncoderCNNBert, self).__init__()
         resnet = models.resnet152(pretrained=True)
         modules = list(resnet.children())[:-1]      # delete the last fc layer.
         self.resnet = nn.Sequential(*modules)
@@ -28,7 +28,7 @@ class EncoderCNNBert(nn.Module):
 class DecoderRNNBert(nn.Module):
     def __init__(self, embed_size, hidden_size, vocab, num_layers, max_seq_length=20):
         """Set the hyper-parameters and build the layers."""
-        super(DecoderRNN, self).__init__()
+        super(DecoderRNNBert, self).__init__()
         Bert_file = "bert-base-uncased.30522.768d.vec"
         print("M1")
         Lookup = gensim.models.KeyedVectors.load_word2vec_format(Bert_file, binary=False)
