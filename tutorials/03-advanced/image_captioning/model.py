@@ -37,8 +37,8 @@ class DecoderRNN(nn.Module):
         Embed[vocab('<start>'),:] = np.random.normal(0, 1, embed_size)
         Embed[vocab('<end>'),:] = np.random.normal(0, 1, embed_size)
         Embed[vocab('<unk>'),:] = np.random.normal(0, 1, embed_size)
-
-        for word in vocab.__keys__():
+        
+        for word in vocab.__keys__()[4:]:
             try:
                 Embed[vocab(word),:] = Lookup[word]
             except:

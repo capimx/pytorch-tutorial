@@ -48,18 +48,21 @@ def main(args):
     # Build data loader
     data_loader = get_loader(args.image_dir, args.caption_path, vocab, 
                              transform, args.batch_size,
-                             shuffle=True, num_workers=args.num_workers) 
+                             shuffle=True, num_workers=args.num_workers)
+    print('Data loaded!\n')
     
     # Build the models
     encoder = EncoderCNN(args.embed_size).to(device)
     decoder = DecoderRNN(args.embed_size, args.hidden_size, vocab, args.num_layers).to(device)
     
     # Loss and optimizer
+    print('Encoder and decoder initialised!\n')
     criterion = nn.CrossEntropyLoss()
     params = list(decoder.parameters()) + list(encoder.linear.parameters()) + list(encoder.bn.parameters())
     optimizer = torch.optim.Adam(params, lr=args.learning_rate)
     
     # Train the models
+    print('Start training:\n')
     total_step = len(data_loader)
     for epoch in range(args.num_epochs):
         for i, (images, captions, lengths) in enumerate(data_loader):
