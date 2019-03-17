@@ -30,24 +30,26 @@ class DecoderRNN(nn.Module):
         """Set the hyper-parameters and build the layers."""
         super(DecoderRNN, self).__init__()
         Bert_file = "bert-base-uncased.30522.768d.vec"
+        print("M1")
         Lookup = gensim.models.KeyedVectors.load_word2vec_format(Bert_file, binary=False)
-        
+        bert_embedding = BertEmbedding()
         Embed = np.zeros((len(vocab), embed_size))
+        print("M2")
         Embed[vocab('<pad>'),:] = np.random.normal(0, 1, embed_size)
         Embed[vocab('<start>'),:] = np.random.normal(0, 1, embed_size)
         Embed[vocab('<end>'),:] = np.random.normal(0, 1, embed_size)
         Embed[vocab('<unk>'),:] = np.random.normal(0, 1, embed_size)
-        
+        print("M3")
         for word in vocab.__keys__()[4:]:
             try:
                 Embed[vocab(word),:] = Lookup[word]
             except:
                 bert_word = word
-                token = bert_word.split('\n')
-                bert_embedding = BertEmbedding()
+                token = bert_word.split('\n')                
                 pred = bert_embedding(token)
                 Embed[vocab(word),:] = pred[0][1][0]
-               
+        
+        print("M4")
         self.embed = nn.Embedding(len(vocab), embed_size)
         self.embed.weight.data.copy_(torch.FloatTensor(Embed))
         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers, batch_first=True)
